@@ -15,8 +15,8 @@ public class Merge {
 		
 		//String tipoDrift = "sudden";
 		//String tipoDrift = "recourrent";
-		//String tipoDrift = "gradual";
-		String tipoDrift = "incremental";
+		String tipoDrift = "gradual";
+		//String tipoDrift = "incremental";
 		
 		final File folderNormal = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logs/anomalyDetectionInEventLogs/normal");
 		final File folderDrifted = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logs/anomalyDetectionInEventLogs/drifted");
@@ -37,22 +37,22 @@ public class Merge {
         	MergeLogs mergeLogs = new MergeLogs(csvFile_a, csvFile_b, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
         	List<Event> processos = new ArrayList<Event>();
         	processos = mergeLogs.doMergeSudden();
-        	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
+        	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("/")[9], tipoDrift);
         } else if (tipoDrift.equals("recourrent")) {
         	MergeLogs mergeLogs = new MergeLogs(csvFile_a, csvFile_b, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
         	List<Event> processos = new ArrayList<Event>();
         	processos = mergeLogs.doMergeRecourrent();
-        	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
+        	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("/")[9], tipoDrift);
         } else if (tipoDrift.equals("gradual")) {
         	MergeLogs mergeLogs = new MergeLogs(csvFile_a, csvFile_b, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
         	List<Event> processos = new ArrayList<Event>();
         	processos = mergeLogs.doMergeGradual();
-        	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
+        	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("/")[9], tipoDrift);
         } else if (tipoDrift.equals("incremental")) {
         	MergeLogs mergeLogs = new MergeLogs(csvFile_a, csvFile_b, csvFile_c, csvFile_d, csvFile_e, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
         	List<Event> processos = new ArrayList<Event>();
         	processos = mergeLogs.doMergeIncremental();
-        	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
+        	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("/")[9], tipoDrift);
         }
 
 	}

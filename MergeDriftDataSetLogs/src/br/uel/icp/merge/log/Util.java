@@ -10,7 +10,7 @@ public class Util {
 	public static boolean save(List<Event> merged, String cabecalho, String logType, String driftType) {
 		try {
 			// Colocar no nome do log o tipo smal, big, giagnt + o tipo do drift
-			File file = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/merged/test.csv");
+			File file = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/merged/"+logType.replace(".csv", "")+"_"+driftType+".csv");
 	        FileWriter fw = new FileWriter(file);
 	        BufferedWriter bw = new BufferedWriter(fw);
 	        String[] newCabecalho = cabecalho.split(",");

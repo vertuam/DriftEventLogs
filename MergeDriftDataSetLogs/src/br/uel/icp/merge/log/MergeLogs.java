@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,14 +55,19 @@ public class MergeLogs {
 
 	@SuppressWarnings("resource")
 	public List<Event> doMergeSudden() {
-		Calendar date = Calendar.getInstance();
-		long t = date.getTimeInMillis();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-		timeProcessStart = simpleDateFormat.format(t);
 		String line = "";
 		List<Event> events = new ArrayList<Event>();
 		BufferedReader br = null;
+		
 		int sequence = 0;
+		
+		int casoAtual = 0;
+		int contaCaso = 0;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+		String timeStart = simpleDateFormat.format(new Date());
+		String timeUpdated = simpleDateFormat.format(new Date());
+		timeUpdated = returntimeStamp(0, timeStart, 0);
+		
 		try {
 			br = new BufferedReader(new FileReader(csvFile_a));
 			while ((line = br.readLine()) != null) {
@@ -82,8 +88,8 @@ public class MergeLogs {
 						event.setAnomalyDescription("-");
 						event.setClasse("-");
 					} else {
-						timeProcessStart = returntimeStamp(event.getEventPosition(), timeProcessStart);
-						event.setTimeStamp(timeProcessStart);
+						timeUpdated = returntimeStamp(event.getEventPosition(), timeUpdated, casoAtual);
+						event.setTimeStamp(timeUpdated);
 						event.setLabel(String.valueOf(line.split(",")[4]));
 						event.setAnomalyType(String.valueOf(line.split(",")[5]));
 						event.setAnomalyDescription(line.split("\"").length > 1 ? line.split("\"")[1] : "-");
@@ -91,6 +97,17 @@ public class MergeLogs {
 					}
 					events.add(event);
 					sequence = Integer.valueOf(line.split(",")[0]);
+					if (casoAtual!=Integer.valueOf(line.split(",")[0])) {
+						if (contaCaso>=60) {
+							timeUpdated = returntimeStamp(999, timeStart, 0);
+							timeStart = timeUpdated;
+							contaCaso=0;
+						} else {
+							timeUpdated = returntimeStamp(0, timeStart, 0);
+						}
+						contaCaso++;
+					}
+					casoAtual = Integer.valueOf(line.split(",")[0]);
 				}
 			}
 			int caseId = 0;
@@ -116,14 +133,19 @@ public class MergeLogs {
 						event.setAnomalyDescription("-");
 						event.setClasse("-");
 					} else {
-						timeProcessStart = returntimeStamp(event.getEventPosition(), timeProcessStart);
-						event.setTimeStamp(timeProcessStart);
+						timeUpdated = returntimeStamp(event.getEventPosition(), timeUpdated, casoAtual);
+						event.setTimeStamp(timeUpdated);
 						event.setLabel(String.valueOf(line.split(",")[4]));
 						event.setAnomalyType(String.valueOf(line.split(",")[5]));
 						event.setAnomalyDescription(line.split("\"").length > 1 ? line.split("\"")[1] : "-");
 						event.setClasse(logType + "_drifted");
 					}
 					events.add(event);
+					if (casoAtual!=Integer.valueOf(line.split(",")[0])) {
+						timeUpdated = returntimeStamp(0, timeStart, 0);
+						contaCaso++;
+					}
+					casoAtual = Integer.valueOf(line.split(",")[0]);
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -143,10 +165,12 @@ public class MergeLogs {
 	}
 
 	public List<Event> doMergeRecourrent() {
-		Calendar date = Calendar.getInstance();
-		long t = date.getTimeInMillis();
+		int casoAtual = 0;
+		int contaCaso = 0;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-		timeProcessStart = simpleDateFormat.format(t);
+		String timeStart = simpleDateFormat.format(new Date());
+		String timeUpdated = simpleDateFormat.format(new Date());
+		timeUpdated = returntimeStamp(0, timeStart, 0);
 		BufferedReader br = null;
 		String line = "";
 		List<Event> events = new ArrayList<Event>();
@@ -154,7 +178,7 @@ public class MergeLogs {
 		Map<Integer, List<Event>> casos_drifitados = new HashMap<>();
 		try {
 			br = new BufferedReader(new FileReader(csvFile_a));
-			int casoAtual = 0;
+			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
@@ -193,7 +217,7 @@ public class MergeLogs {
 		}
 		try {
 			br = new BufferedReader(new FileReader(csvFile_a));
-			int casoAtual = 0;
+			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
@@ -248,35 +272,48 @@ public class MergeLogs {
 				events.addAll(ls);
 			}
 		}
-
+		
 		for (Entry<Integer, List<Event>> entry : casos_drifitados.entrySet()) {
 			if (entry.getKey() >= drift_1 + 1 && entry.getKey() <= normal_2) {
 				List<Event> ls = entry.getValue();
 				events.addAll(ls);
 			}
 		}
-
+		
 		for (Entry<Integer, List<Event>> entry : casos_normais.entrySet()) {
 			if (entry.getKey() >= normal_2 + 1 && entry.getKey() <= drift_2) {
 				List<Event> ls = entry.getValue();
 				events.addAll(ls);
 			}
 		}
-
+		
 		for (Entry<Integer, List<Event>> entry : casos_drifitados.entrySet()) {
 			if (entry.getKey() >= drift_2 + 1 && entry.getKey() <= caseNumbersN) {
 				List<Event> ls = entry.getValue();
 				events.addAll(ls);
 			}
 		}
+		
+		casoAtual = 0;
 
 		for (Event event : events) {
 			if (event.getActivityName().equals("▶") || event.getActivityName().equals("■")) {
 				event.setTimeStamp("");
 			} else {
-				timeProcessStart = returntimeStamp(event.getEventPosition(), timeProcessStart);
-				event.setTimeStamp(timeProcessStart);
+				timeUpdated = returntimeStamp(event.getEventPosition(), timeUpdated, casoAtual);
+				event.setTimeStamp(timeUpdated);
 			}
+			if (casoAtual!=event.getCaseId()) {
+				if (contaCaso>=60) {
+					timeUpdated = returntimeStamp(999, timeStart, 0);
+					timeStart = timeUpdated;
+					contaCaso=0;
+				} else {
+					timeUpdated = returntimeStamp(0, timeStart, 0);
+				}
+				contaCaso++;
+			}
+			casoAtual = event.getCaseId();
 		}
 
 		return events;
@@ -284,10 +321,12 @@ public class MergeLogs {
 	}
 
 	public List<Event> doMergeGradual() {
-		Calendar date = Calendar.getInstance();
-		long t = date.getTimeInMillis();
+		int casoAtual = 0;
+		int contaCaso = 0;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-		timeProcessStart = simpleDateFormat.format(t);
+		String timeStart = simpleDateFormat.format(new Date());
+		String timeUpdated = simpleDateFormat.format(new Date());
+		timeUpdated = returntimeStamp(0, timeStart, 0);
 		BufferedReader br = null;
 		String line = "";
 		List<Event> events = new ArrayList<Event>();
@@ -295,7 +334,7 @@ public class MergeLogs {
 		Map<Integer, List<Event>> casos_drifitados = new HashMap<>();
 		try {
 			br = new BufferedReader(new FileReader(csvFile_a));
-			int casoAtual = 0;
+			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
@@ -334,7 +373,7 @@ public class MergeLogs {
 		}
 		try {
 			br = new BufferedReader(new FileReader(csvFile_a));
-			int casoAtual = 0;
+			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
@@ -469,9 +508,20 @@ public class MergeLogs {
 			if (event.getActivityName().equals("▶") || event.getActivityName().equals("■")) {
 				event.setTimeStamp("");
 			} else {
-				timeProcessStart = returntimeStamp(event.getEventPosition(), timeProcessStart);
-				event.setTimeStamp(timeProcessStart);
+				timeUpdated = returntimeStamp(event.getEventPosition(), timeUpdated, casoAtual);
+				event.setTimeStamp(timeUpdated);
 			}
+			if (casoAtual!=event.getCaseId()) {
+				if (contaCaso>=60) {
+					timeUpdated = returntimeStamp(999, timeStart, 0);
+					timeStart = timeUpdated;
+					contaCaso=0;
+				} else {
+					timeUpdated = returntimeStamp(0, timeStart, 0);
+				}
+				contaCaso++;
+			}
+			casoAtual = event.getCaseId();
 		}
 
 		return events;
@@ -479,10 +529,12 @@ public class MergeLogs {
 	}
 
 	public List<Event> doMergeIncremental() {
-		Calendar date = Calendar.getInstance();
-		long t = date.getTimeInMillis();
+		int casoAtual = 0;
+		int contaCaso = 0;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-		timeProcessStart = simpleDateFormat.format(t);
+		String timeStart = simpleDateFormat.format(new Date());
+		String timeUpdated = simpleDateFormat.format(new Date());
+		timeUpdated = returntimeStamp(0, timeStart, 0);
 		BufferedReader br = null;
 		String line = "";
 		List<Event> events = new ArrayList<Event>();
@@ -493,7 +545,7 @@ public class MergeLogs {
 		Map<Integer, List<Event>> casos_drifitados4 = new HashMap<>();
 		try {
 			br = new BufferedReader(new FileReader(csvFile_a));
-			int casoAtual = 0;
+			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
@@ -532,7 +584,7 @@ public class MergeLogs {
 		}
 		try {
 			br = new BufferedReader(new FileReader(csvFile_a));
-			int casoAtual = 0;
+			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
@@ -570,7 +622,7 @@ public class MergeLogs {
 		}
 		try {
 			br = new BufferedReader(new FileReader(csvFile_c));
-			int casoAtual = 0;
+			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
@@ -608,7 +660,7 @@ public class MergeLogs {
 		}
 		try {
 			br = new BufferedReader(new FileReader(csvFile_c));
-			int casoAtual = 0;
+			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
@@ -646,7 +698,7 @@ public class MergeLogs {
 		}
 		try {
 			br = new BufferedReader(new FileReader(csvFile_c));
-			int casoAtual = 0;
+			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
@@ -692,16 +744,27 @@ public class MergeLogs {
 			if (event.getActivityName().equals("▶") || event.getActivityName().equals("■")) {
 				event.setTimeStamp("");
 			} else {
-				timeProcessStart = returntimeStamp(event.getEventPosition(), timeProcessStart);
-				event.setTimeStamp(timeProcessStart);
+				timeUpdated = returntimeStamp(event.getEventPosition(), timeUpdated, casoAtual);
+				event.setTimeStamp(timeUpdated);
 			}
+			if (casoAtual!=event.getCaseId()) {
+				if (contaCaso>=60) {
+					timeUpdated = returntimeStamp(999, timeStart, 0);
+					timeStart = timeUpdated;
+					contaCaso=0;
+				} else {
+					timeUpdated = returntimeStamp(0, timeStart, 0);
+				}
+				contaCaso++;
+			}
+			casoAtual = event.getCaseId();
 		}
 		
 		return events;
 		
 	}
 
-	private String returntimeStamp(int i, String timeProcessStart) {
+	private String returntimeStamp(int i, String timeProcessStart, int casoAtual) {
 		Calendar date = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.ENGLISH);
 		
@@ -715,29 +778,31 @@ public class MergeLogs {
 		Date afterAddingTenMins = null;
 		
 		if (i == 0) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus15));
+			afterAddingTenMins = new Date(t);
 		} else if (i == 1) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus60));
+			afterAddingTenMins = new Date(t + casoAtual*10000);
 		} else if (i == 2) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus30));
+			afterAddingTenMins = new Date(t + randomInterval(TimeIncrement.plus60, TimeIncrement.plus15));
 		} else if (i == 3) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus60));
+			afterAddingTenMins = new Date(t + randomInterval(TimeIncrement.plus60, TimeIncrement.plus45));
 		} else if (i == 4) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus60));
+			afterAddingTenMins = new Date(t + randomInterval(TimeIncrement.plus60, TimeIncrement.plus30));
 		} else if (i == 5) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus30));
+			afterAddingTenMins = new Date(t + randomInterval(TimeIncrement.plus60, TimeIncrement.plus15));
 		} else if (i == 6) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus30));
+			afterAddingTenMins = new Date(t + randomInterval(TimeIncrement.plus60, TimeIncrement.plus45));
 		} else if (i == 7) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus60));
+			afterAddingTenMins = new Date(t + randomInterval(TimeIncrement.plus60, TimeIncrement.plus30));
 		} else if (i == 8) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus30));
+			afterAddingTenMins = new Date(t + randomInterval(TimeIncrement.plus60, TimeIncrement.plus15));
 		} else if (i == 9) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus30));
+			afterAddingTenMins = new Date(t + randomInterval(TimeIncrement.plus60, TimeIncrement.plus45));
 		} else if (i == 10) {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus60));
+			afterAddingTenMins = new Date(t + randomInterval(TimeIncrement.plus60, TimeIncrement.plus30));
+		} else if (i == 999) {
+			afterAddingTenMins = new Date(t + TimeIncrement.plus30);
 		} else {
-			afterAddingTenMins = new Date(t + (TimeIncrement.plus30) + 900000);
+			afterAddingTenMins = new Date(t + randomInterval(TimeIncrement.plus60, TimeIncrement.plus15));
 		}
 
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
@@ -745,5 +810,10 @@ public class MergeLogs {
 
 		return dateTime;
 	}
+	
+	public static int randomInterval(int s, int i) {
+        Random rd = new Random();
+        return rd.nextInt(s - i + 1) + i;
+    }
 
 }

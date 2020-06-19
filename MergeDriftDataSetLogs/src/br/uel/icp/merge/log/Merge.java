@@ -31,7 +31,7 @@ public class Merge {
 		String csvFile_d = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small_4-0.1-1.csv";
 		String csvFile_e = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small_5-0.1-1.csv";
 
-        /*if (tipoDrift.equals("sudden")) {
+        if (tipoDrift.equals("sudden")) {
         	MergeLogs mergeLogs = new MergeLogs(csvFile_a, csvFile_b, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
         	List<Event> processos = new ArrayList<Event>();
         	processos = mergeLogs.doMergeSudden();
@@ -51,7 +51,7 @@ public class Merge {
         	List<Event> processos = new ArrayList<Event>();
         	processos = mergeLogs.doMergeGradual();
         	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
-        }*/
+        }
 
 	}
 	

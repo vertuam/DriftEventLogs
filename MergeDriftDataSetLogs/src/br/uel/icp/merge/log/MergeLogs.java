@@ -738,17 +738,17 @@ public class MergeLogs {
 		
 		// TODO - Mergear os logs
 		
-		// Not drifted LOG - 1
-		// Drifted LOG - 2
+		// 100 cases, daria pra ter algo do tipo. 40 cases CN - 3 cases CD1 - 3 cases CD2 - 3 cases CD3 - 41 cases CD Final
 		
-		// Not drifted LOG - 1
-		// Drifted LOG - 3
+		// Not drifted LOG - 1 (40 Casos Normais)
 		
-		// Not drifted LOG - 1
-		// Drifted LOG - 4
+		// Drifted LOG - 2 (3 Cases Drifitados)
 		
-		// Not drifted LOG - 1
-		// Drifted LOG - 5
+		// Drifted LOG - 3 (3 Casos Drifitados)
+		
+		// Drifted LOG - 4 (3 Casos Drifitados)
+		
+		// Drifted LOG - 5 (41 Casos Drifitados)
 		
 		for (Event event : events) {
 			if (event.getActivityName().equals("▶") || event.getActivityName().equals("■")) {

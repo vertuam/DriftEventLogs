@@ -626,7 +626,7 @@ public class MergeLogs {
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
-					System.out.println("Ignorando cabeçalho segundo log.");
+					System.out.println("Ignorando cabeçalho terceiro log.");
 				} else {
 					linha = Integer.valueOf(line.split(",")[0]);
 					if (casoAtual != linha) {
@@ -659,12 +659,12 @@ public class MergeLogs {
 			System.out.println(e);
 		}
 		try {
-			br = new BufferedReader(new FileReader(csvFile_c));
+			br = new BufferedReader(new FileReader(csvFile_d));
 			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
-					System.out.println("Ignorando cabeçalho segundo log.");
+					System.out.println("Ignorando cabeçalho quarto log.");
 				} else {
 					linha = Integer.valueOf(line.split(",")[0]);
 					if (casoAtual != linha) {
@@ -697,12 +697,12 @@ public class MergeLogs {
 			System.out.println(e);
 		}
 		try {
-			br = new BufferedReader(new FileReader(csvFile_c));
+			br = new BufferedReader(new FileReader(csvFile_e));
 			casoAtual = 0;
 			int linha = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.contains("activity_name")) {
-					System.out.println("Ignorando cabeçalho segundo log.");
+					System.out.println("Ignorando cabeçalho quinto log.");
 				} else {
 					linha = Integer.valueOf(line.split(",")[0]);
 					if (casoAtual != linha) {
@@ -736,19 +736,104 @@ public class MergeLogs {
 		}
 		events = new ArrayList<Event>();
 		
-		// TODO - Mergear os logs
+		// 100 cases, daria pra ter algo do tipo. 40% cases CN - 3% cases CD1 - 3% cases CD2 - 3% cases CD3 - 41% cases CD4 Final
+		int totalCasosNormais = casos_normais.size();
+		int numeroCasosNormais = totalCasosNormais*40/100;
+		System.out.println(numeroCasosNormais);
 		
-		// 100 cases, daria pra ter algo do tipo. 40 cases CN - 3 cases CD1 - 3 cases CD2 - 3 cases CD3 - 41 cases CD Final
+		// Not drifted LOG - 1
+		for (Entry<Integer, List<Event>> entry : casos_normais.entrySet()) {
+			int numeroCaso = 0;
+			for (Event event : entry.getValue()) {
+				numeroCaso = event.getCaseId();
+				events.add(event);
+				if (numeroCaso!=event.getCaseId()) {
+					break;
+				}
+			}
+			if (entry.getKey()>=numeroCasosNormais) {
+				break;
+			}
+		}
 		
 		// Not drifted LOG - 1 (40 Casos Normais)
+		int totalCasosDrifitados1 = casos_drifitados1.size();
+		int numeroCasosDrifitados1 = totalCasosDrifitados1*3/100;
+		System.out.println(numeroCasosDrifitados1);
 		
+		/// Not drifted LOG - 1
+		for (Entry<Integer, List<Event>> entry : casos_drifitados1.entrySet()) {
+			int numeroCaso = entry.getKey();
+			for (Event event : entry.getValue()) {
+				events.add(event);
+				if (numeroCaso!=event.getCaseId()) {
+					break;
+				}
+			}
+			if (entry.getKey()>=numeroCasosDrifitados1) {
+				break;
+			}
+		}
+
 		// Drifted LOG - 2 (3 Cases Drifitados)
+		int totalCasosDrifitados2 = casos_drifitados2.size();
+		int numeroCasosDrifitados2 = totalCasosDrifitados2*43/100;
+		System.out.println(numeroCasosDrifitados2);
+		
+		/// Not drifted LOG - 2
+		for (Entry<Integer, List<Event>> entry : casos_drifitados2.entrySet()) {
+			int numeroCaso = entry.getKey();
+			for (Event event : entry.getValue()) {
+				events.add(event);
+				if (numeroCaso!=event.getCaseId()) {
+					break;
+				}
+				numeroCaso = event.getCaseId();
+			}
+			if (entry.getKey()>=numeroCasosDrifitados2) {
+				break;
+			}
+		}
 		
 		// Drifted LOG - 3 (3 Casos Drifitados)
+		int totalCasosDrifitados3 = casos_drifitados3.size();
+		int numeroCasosDrifitados3 = totalCasosDrifitados3*3/100;
+		System.out.println(numeroCasosDrifitados3);
+		
+		/// Not drifted LOG - 3
+		for (Entry<Integer, List<Event>> entry : casos_drifitados3.entrySet()) {
+			int numeroCaso = entry.getKey();
+			for (Event event : entry.getValue()) {
+				events.add(event);
+				if (numeroCaso!=event.getCaseId()) {
+					break;
+				}
+				numeroCaso = event.getCaseId();
+			}
+			if (entry.getKey()>=numeroCasosDrifitados3) {
+				break;
+			}
+		}
 		
 		// Drifted LOG - 4 (3 Casos Drifitados)
+		int totalCasosDrifitados4 = casos_drifitados4.size();
+		int numeroCasosDrifitados4 = totalCasosDrifitados4*41/100;
+		System.out.println(numeroCasosDrifitados4);
 		
-		// Drifted LOG - 5 (41 Casos Drifitados)
+		/// Not drifted LOG - 4
+		for (Entry<Integer, List<Event>> entry : casos_drifitados4.entrySet()) {
+			int numeroCaso = entry.getKey();
+			for (Event event : entry.getValue()) {
+				events.add(event);
+				if (numeroCaso!=event.getCaseId()) {
+					break;
+				}
+				numeroCaso = event.getCaseId();
+			}
+			if (entry.getKey()>=numeroCasosDrifitados4) {
+				break;
+			}
+		}
 		
 		for (Event event : events) {
 			if (event.getActivityName().equals("▶") || event.getActivityName().equals("■")) {

@@ -11,12 +11,12 @@ public class Merge {
 
 	public static void main(String[] args) {
 		
-		String tipoDrift = "";
+		//String tipoDrift = "";
 		
 		//String tipoDrift = "sudden";
 		//String tipoDrift = "recourrent";
 		//String tipoDrift = "gradual";
-		//String tipoDrift = "incremental";
+		String tipoDrift = "incremental";
 		
 		final File folderNormal = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logs/anomalyDetectionInEventLogs/normal");
 		final File folderDrifted = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logs/anomalyDetectionInEventLogs/drifted");
@@ -26,12 +26,12 @@ public class Merge {
 
 		// Carrega dois logs files para sudden, recourrent e gradual
 		String csvFile_a = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small-0.1-1.csv";
-		String csvFile_b = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small_2-0.1-1.csv";
+		String csvFile_b = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small_2-0.0-1.csv";
 
 		// Apenas para incremental
-		String csvFile_c = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small_3-0.1-1.csv";
-		String csvFile_d = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small_4-0.1-1.csv";
-		String csvFile_e = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small_5-0.1-1.csv";
+		String csvFile_c = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small_3-0.0-1.csv";
+		String csvFile_d = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small_4-0.0-1.csv";
+		String csvFile_e = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small_5-0.0-1.csv";
 
         if (tipoDrift.equals("sudden")) {
         	MergeLogs mergeLogs = new MergeLogs(csvFile_a, csvFile_b, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
@@ -48,10 +48,10 @@ public class Merge {
         	List<Event> processos = new ArrayList<Event>();
         	processos = mergeLogs.doMergeGradual();
         	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
-        } else if (tipoDrift.equals("gradual")) {
+        } else if (tipoDrift.equals("incremental")) {
         	MergeLogs mergeLogs = new MergeLogs(csvFile_a, csvFile_b, csvFile_c, csvFile_d, csvFile_e, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
         	List<Event> processos = new ArrayList<Event>();
-        	processos = mergeLogs.doMergeGradual();
+        	processos = mergeLogs.doMergeIncremental();
         	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("-")[0].split("/")[9], tipoDrift);
         }
 

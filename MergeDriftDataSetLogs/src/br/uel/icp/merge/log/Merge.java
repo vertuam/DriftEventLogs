@@ -5,22 +5,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Merge {
+	
+	static List<String> logNormal = new ArrayList<String>();
+	static List<String> logDrifted = new ArrayList<String>();
 
 	public static void main(String[] args) {
-
-		List<String> logNormal = new ArrayList<String>();
-		List<String> logDrifted = new ArrayList<String>();
+		
+		String tipoDrift = "";
 		
 		//String tipoDrift = "sudden";
 		//String tipoDrift = "recourrent";
-		String tipoDrift = "gradual";
+		//String tipoDrift = "gradual";
 		//String tipoDrift = "incremental";
 		
 		final File folderNormal = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logs/anomalyDetectionInEventLogs/normal");
 		final File folderDrifted = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logs/anomalyDetectionInEventLogs/drifted");
 		
-		logNormal = listFilesForFolder(folderNormal);
-		logDrifted = listFilesForFolder(folderDrifted);
+		listFilesForFolderNormal(folderNormal);
+		listFilesForFolderDrifted(folderDrifted);
 
 		// Carrega dois logs files para sudden, recourrent e gradual
 		String csvFile_a = "/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/original/small-0.1-1.csv";
@@ -55,16 +57,24 @@ public class Merge {
 
 	}
 	
-	public static List<String> listFilesForFolder(final File folder) {
-		List<String> logs = new ArrayList<String>();
+	public static void listFilesForFolderNormal(final File folder) {
 	    for (final File fileEntry : folder.listFiles()) {
 	        if (fileEntry.isDirectory()) {
-	            listFilesForFolder(fileEntry);
+	        	listFilesForFolderNormal(fileEntry);
 	        } else {
-	        	logs.add(fileEntry.getAbsolutePath()+"/"+fileEntry.getName());
+	        	logNormal.add(fileEntry.getAbsolutePath()+"/"+fileEntry.getName());
 	        }
 	    }
-		return logs;
+	}
+	
+	public static void listFilesForFolderDrifted(final File folder) {
+	    for (final File fileEntry : folder.listFiles()) {
+	        if (fileEntry.isDirectory()) {
+	        	listFilesForFolderDrifted(fileEntry);
+	        } else {
+	        	logDrifted.add(fileEntry.getAbsolutePath()+"/"+fileEntry.getName());
+	        }
+	    }
 	}
 
 }

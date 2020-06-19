@@ -738,7 +738,17 @@ public class MergeLogs {
 		
 		// TODO - Mergear os logs
 		
+		// Not drifted LOG - 1
+		// Drifted LOG - 2
 		
+		// Not drifted LOG - 1
+		// Drifted LOG - 3
+		
+		// Not drifted LOG - 1
+		// Drifted LOG - 4
+		
+		// Not drifted LOG - 1
+		// Drifted LOG - 5
 		
 		for (Event event : events) {
 			if (event.getActivityName().equals("▶") || event.getActivityName().equals("■")) {

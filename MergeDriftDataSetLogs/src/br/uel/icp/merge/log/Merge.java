@@ -11,11 +11,15 @@ public class Merge {
 
 	public static void main(String[] args) {
 		
-		//String tipoDrift = "";
+		String tipoDrift = args[0];
+		
+		for (String string : args) {
+			System.out.println(":: "+string+" ::");
+		}
 		
 		//String tipoDrift = "sudden";
 		//String tipoDrift = "recourrent";
-		String tipoDrift = "gradual";
+		//String tipoDrift = "gradual";
 		//String tipoDrift = "incremental";
 		
 		final File folderNormal = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logs/anomalyDetectionInEventLogs/normal");
@@ -53,6 +57,20 @@ public class Merge {
         	List<Event> processos = new ArrayList<Event>();
         	processos = mergeLogs.doMergeIncremental();
         	Util.save(processos, MergeLogs.cabecalho, csvFile_a.split("/")[9], tipoDrift);
+        } else if (tipoDrift.equals("--help")) {
+        	System.out.println("");
+        	System.out.println("PARAMETROS");
+        	System.out.println("-----------------------------------------");
+        	System.out.println("");
+        	System.out.println("tipoDrift diretorio_log_normal diretorio_log_driftado");
+        	System.out.println("");
+        	System.out.println("+---------------------------------------+");
+        	System.out.println("|       TIPOS DE DRIFT SUPORTADOS       |");
+        	System.out.println("+---------------------------------------+");
+        	System.out.println("| SUDDEN RECOURRENT GRADUAL OMCRMENTAL  |");
+        	System.out.println("+---------------------------------------+");
+        } else {
+        	System.out.println("--help para ajuda");
         }
 
 	}

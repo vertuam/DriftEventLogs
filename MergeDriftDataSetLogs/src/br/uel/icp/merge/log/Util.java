@@ -7,10 +7,10 @@ import java.util.List;
 
 public class Util {
 
-	public static boolean save(List<Event> merged, String cabecalho, String logType, String driftType) {
+	public static boolean save(List<Event> merged, String cabecalho, String logType, String driftType, String fullFileNome, String pastaInterna) {
 		try {
 			// Colocar no nome do log o tipo smal, big, giagnt + o tipo do drift
-			File file = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logsMergeJava/merged/"+logType.replace(".csv", "")+"_"+driftType+".csv");
+			File file = new File("/Users/vertuam/Desktop/Artigo/ICPM_2020_Clustering/Experimentacao/logs/anomalyDetectionInEventLogs/merged/"+pastaInterna+"/"+fullFileNome.replace(".csv", "")+"_"+driftType+".csv");
 	        FileWriter fw = new FileWriter(file);
 	        BufferedWriter bw = new BufferedWriter(fw);
 	        String[] newCabecalho = cabecalho.split(",");
